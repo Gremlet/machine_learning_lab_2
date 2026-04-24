@@ -17,12 +17,7 @@ from torchcam.utils import overlay_mask
 
 class Visualiser:
     """
-    Small helper class for generating CAM visualisations with a pretrained ResNet18 model.
-
-    Designed for:
-    - default-layer CAMs for G
-    - custom layer CAMs for VG
-    - notebook-friendly usage without storing lots of mutable state
+    Class for generating CAM visualisations with a pretrained ResNet18 model.
     """
 
     def __init__(self, labels_path: str | Path | None = None) -> None:
@@ -49,19 +44,19 @@ class Visualiser:
         }
 
     def load_image(self, image_path: str | Path) -> torch.Tensor:
-        """Load an image from disk as a tensor."""
+        # Load an image from disk as a tensor
         return decode_image(str(image_path))
 
     def preprocess_image(self, image_tensor: torch.Tensor) -> torch.Tensor:
-        # Apply model-specific transforms and add a batch dimension.
+        # Apply model-specific transforms and add a batch dimension
         return self.preprocess(image_tensor).unsqueeze(0)
 
     def get_label(self, class_index: int) -> str:
-        """Return human-readable label for a class index."""
+        # Return human-readable label for a class index
         return self.labels[class_index][1]
 
     def find_class_indices(self, search_term: str) -> list[tuple[int, str]]:
-        """Find ImageNet class indices whose labels contain the given search term."""
+        # Find ImageNet class indices whose labels contain the given search term
         search_term = search_term.lower()
         matches: list[tuple[int, str]] = []
 
@@ -74,8 +69,8 @@ class Visualiser:
     def get_top_predictions(
         self, logits: torch.Tensor, top_k: int = 5
     ) -> list[dict[str, Any]]:
-        """Convert logits into a list of top-k predictions with labels and probabilities."""
-        probs = softmax(logits, dim=1)  # convert logits to probabilities
+        # Convert logits into a list of top-k predictions with labels and probabilities
+        probs = softmax(logits, dim=1)
         top_probs, top_ids = torch.topk(probs, k=top_k, dim=1)
 
         results: list[dict[str, Any]] = []
@@ -150,7 +145,7 @@ class Visualiser:
         title: str | None = None,
         figsize: tuple[int, int] = (6, 6),
     ) -> None:
-        """Plot a single CAM overlay result."""
+        # Plot a single CAM overlay result
         plt.figure(figsize=figsize)
         plt.imshow(result["overlay"])
         plt.axis("off")
@@ -169,9 +164,8 @@ class Visualiser:
         layer_names: list[str] | None = None,
         alpha: float = 0.5,
     ) -> list[dict[str, Any]]:
-        """
-        Generate CAM overlays for multiple layers for the same image/class.
-        """
+
+        # Generate CAM overlays for multiple layers for the same image/class
         if layer_names is None:
             layer_names = ["layer1", "layer3", "layer4"]
 
@@ -192,7 +186,7 @@ class Visualiser:
         results: list[dict[str, Any]],
         suptitle: str | None = None,
     ) -> None:
-        """Plot multiple layer results side by side."""
+        # Plot multiple layer results side by side.
         fig, axes = plt.subplots(1, len(results), figsize=(6 * len(results), 6))
 
         if len(results) == 1:
